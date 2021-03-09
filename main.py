@@ -4,52 +4,80 @@ import sys
 from PIL import Image
 
 
-# define a function for
-# compressing an image
-def compressMe(file, cwd, verbose=False):
-    # Get the path of the file
-    # filepath = os.path.join(os.getcwd(), file)
-    filepath = cwd + file
+def resizeCrop(im, crop_width, crop_height):
+    # resize the image first
+    curr_width, curr_height = im.size
+    curr_ratio = curr_width / curr_height
 
-    # open the image
-    picture = Image.open(filepath)
+    # check if current width or current
+    # height fits better to desired format
+    d_width = curr_width - crop_width
+    d_height = curr_height - crop_height
+
+    # resize to crop_width but with
+    # old aspect ratio
+    if d_width <= d_height:
+        im = im.resize((crop_width, int(crop_width / curr_ratio)), Image.ANTIALIAS)
+    else:
+        im = im.resize((int(crop_height * curr_ratio), crop_height), Image.ANTIALIAS)
+
+    # finally, crop the image to specific size
+    im_cropped = im.crop((0, 0, crop_width, crop_height))
+
+    return im_cropped
+
+
+def saveImg(name, im, format, quality, cwd):
+    # try to create folder for resized and cropped images
+    try:
+        os.mkdir(f'{cwd}/resized')
+    except OSError:
+        print("Creation of the directory %s failed" % f"{cwd}/resized")
+    else:
+        print("Successfully created the directory %s " % f"{cwd}/resized")
 
     # Save the picture with desired quality
-    # To change the quality of image,
-    # set the quality variable at
-    # your desired level, The more
-    # the value of quality variable
-    # and lesser the compression
-    picture.save("Compressed_" + file,
-                 "JPEG",
-                 optimize=True,
-                 quality=10)
-    return
+    im.save(f"resized/{name}",
+            f"{format}",
+            optimize=True,
+            quality=quality)
 
 
 # Define a main function
 def main():
-    verbose = False
 
-    # checks for verbose flag
-    if (len(sys.argv) > 1):
-
-        if (sys.argv[1].lower() == "-v"):
-            verbose = True
+    # setup configuration
+    cfg = {
+        'cropping': True,                      # want to crop your images?
+        'crop_x': 400,                          # crop width to ??? px
+        'crop_y': 550,                          # crop height to ??? px
+        'compressing': True,                    # want to compress your images?
+        'format': 'PNG',                        # output format of your images
+        'quality': 50,                          # high compression | 0 to 100 | no compression
+        'formats': ('.jpg', '.jpeg', '.png'),   # allowed image formats
+        'verbose': False                        # verbose flag?
+    }
 
     # finds current working dir
+    # which should contain the images
     cwd = os.getcwd()
 
-    formats = ('.jpg', '.jpeg', '.png')
-
     # looping through all the files
-    # in a current directory
     for file in os.listdir(cwd):
 
-        # If the file format is JPG or JPEG
-        if os.path.splitext(file)[1].lower() in formats:
-            print('compressing', file)
-            compressMe(file, cwd, verbose)
+        # if the file format is JPG, JPEG or PNG
+        if os.path.splitext(file)[1].lower() in cfg['formats']:
+            print('processing', file)
+
+            # load current image
+            im = Image.open(f'{cwd}/{file}')
+
+            # if image should be compressed
+            if cfg['cropping']:
+                im = resizeCrop(im=im, crop_width=cfg['crop_x'], crop_height=cfg['crop_y'])
+
+            # save cropped and compressed image
+            saveImg(name=file, im=im, format=cfg['format'], quality=cfg['quality'], cwd=cwd)
 
     print("Done")
 
