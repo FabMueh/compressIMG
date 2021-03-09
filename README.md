@@ -1,6 +1,6 @@
 # compressionIMG
 
-Easy to use Python script based on Pillow that allows you to compress any JPEG / PNG files.
+Easy to use Python script based on Pillow that allows you to resize, crop and compress any JPEG / PNG files.
 
 ## Installation & Usage 
 
@@ -24,4 +24,3 @@ You can also adjust some configuration within the `main()`function.
         'formats': ('.jpg', '.jpeg', '.png'),   # allowed image formats
         'verbose': False                        # verbose flag?
     }
-´´´
