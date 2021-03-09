@@ -72,12 +72,18 @@ def main():
             # load current image
             im = Image.open(f'{cwd}/{file}')
 
-            # if image should be compressed
+            # if image should be cropped
             if cfg['cropping']:
                 im = resizeCrop(im=im, crop_width=cfg['crop_x'], crop_height=cfg['crop_y'])
 
+            # if image should be compressed
+            if cfg['compressing']:
+                quality = cfg['quality']
+            else:
+                quality = 100
+
             # save cropped and compressed image
-            saveImg(name=file, im=im, format=cfg['format'], quality=cfg['quality'], cwd=cwd)
+            saveImg(name=file, im=im, format=cfg['format'], quality=quality, cwd=cwd)
 
     print("Done")
 
