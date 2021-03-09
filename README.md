@@ -12,7 +12,7 @@ Easy to use Python script based on Pillow that allows you to compress any JPEG /
 
 You can also adjust some configuration within the `main()`function. 
 
-´´´Pyhton
+```Pyhton
 # setup configuration
     cfg = {
         'cropping': True,                       # want to crop your images?
@@ -24,4 +24,4 @@ You can also adjust some configuration within the `main()`function.
         'formats': ('.jpg', '.jpeg', '.png'),   # allowed image formats
         'verbose': False                        # verbose flag?
     }
-```
+´´´
